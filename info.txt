@@ -1,0 +1,17 @@
+Docker prod : 
+ - rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+ - nflight@1.0.6: This module is not supported, and leaks memory. Do not use it.
+ - @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+ - @humanwhocodes/config-array@0.11.14: Use @eslint/config-array instead
+ - glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+ - 404 Not Found - GET https://registry.npmjs.org/vue-component-type-services/-/vue-component-type-services-2.0.29.tgz - Not found
+ - 404  'vue-component-type-services@https://registry.npmjs.org/vue-component-type-services/-/vue-component-type-services-2.0.29.tgz' is not in this registry.
+ - npm available! 10.9.2 -> 11.1.0
+
+
+ Docker dev :
+ - package.json
+
+
+ Readme => doc sur l'installation
