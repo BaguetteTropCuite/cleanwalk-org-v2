@@ -16,6 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Majuscules de merde
+        run: |
+          echo "ACTOR_LOWER=$(echo '${{ github.actor }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Set up Git for checking changes
         run: git fetch --prune --unshallow
 
@@ -47,23 +52,23 @@ jobs:
           fi
 
       - name: Login
-        run: echo "${{ secrets.ghrc }}" | docker login ghcr.io -u $(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]') --password-stdin
+        run: echo "${{ secrets.ghrc }}" | docker login ghcr.io -u ${{ env.ACTOR_LOWER }} --password-stdin
 
       # Si changement dans le front alors build
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
         run: |
-          docker build -f ./frontend/Dockerfile -t ghcr.io/${{ github.repository }}/frontend:latest ./frontend
-          docker push ghcr.io/${{ github.repository }}/frontend:latest
+          docker build -f ./frontend/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./frontend
+          docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
 
       # Si changement dans api alors build
       - name: Build API
         if: env.API_CHANGED == 'true'
         run: |
-          docker build -f ./api/Dockerfile.prod -t ghcr.io/${{ github.repository }}/api:latest ./api
-          docker build -f ./api/Dockerfile.dev -t ghcr.io/${{ github.repository }}/api.dev:latest ./api
-          docker push ghcr.io/${{ github.repository }}/api:latest
-          docker push ghcr.io/${{ github.repository }}/api.dev:latest
+          docker build -f ./api/Dockerfile.prod -t ghcr.io/${{ env.REPO_LOWER }}/api:latest ./api
+          docker build -f ./api/Dockerfile.dev -t ghcr.io/${{ env.REPO_LOWER }}/api.dev:latest ./api
+          docker push ghcr.io/${{ env.REPO_LOWER }}/api:latest
+          docker push ghcr.io/${{ env.REPO_LOWER }}/api.dev:latest
 
   deploy:
     needs: build
