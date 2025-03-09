@@ -1,58 +1,86 @@
-name: Deploy to VPS
+name: Deploy V1 TEST
+
+# Générer un token (write:packages, delete:packages)
+# CHANGER "git pull origin main" par "git pull origin release"
 
 on:
   push:
     branches:
-      - release # Déclencher le déploiement uniquement sur la branche release
+      - main  # "release" pour CW
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.SECRET_KEY }}  # Utilisation de la clé SSH
+      - name: Set up Git for checking changes
+        run: git fetch --prune --unshallow
 
-    - name: Backup current state
-      env:
-        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $VPS_CONNECTION '
-          rm -rf /home/cleanwalk/cleanwalk-backup &&
-          cp -r /home/cleanwalk/cleanwalk-org-v2 /home/cleanwalk/cleanwalk-backup
-        '
+      # Check des changements dans API et FRONT
+      - name: Check if front has changed
+        id: check_frontend
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^frontend/'; then
+            echo "FRONTEND_CHANGED=true" >> $GITHUB_ENV
+          else
+            echo "FRONTEND_CHANGED=false" >> $GITHUB_ENV
+          fi
 
-    - name: Deploy to VPS
-      env:
-        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $VPS_CONNECTION '
-          cd /home/cleanwalk/cleanwalk-org-v2 &&
-          git pull origin release &&
-          docker compose -f docker-compose.prod.yml down &&
-          docker compose -f docker-compose.prod.yml up -d --build
-        '
+      - name: Check if api has changed
+        id: check_api
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^api/'; then
+            echo "API_CHANGED=true" >> $GITHUB_ENV
+          else
+            echo "API_CHANGED=false" >> $GITHUB_ENV
+          fi
 
-    - name: Cleanup backup
-      if: success()
-      env:
-        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $VPS_CONNECTION '
-          rm -rf /home/cleanwalk/cleanwalk-backup
-        '
+      # STOP si aucun changement détecté
+      - name: Stop if no changed was made to front or api
+        run: |
+          if [[ "$FRONTEND_CHANGED" == "false" && "$API_CHANGED" == "false" ]]; then
+            echo "Aucun changement dans frontend ou API, arrêt du workflow."
+            exit 0
+          fi
 
-    - name: Rollback (if needed)
-      if: failure()
-      env:
-        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $VPS_CONNECTION '
-          cd /home/cleanwalk/cleanwalk-backup &&
-          docker compose -f docker-compose.prod.yml up -d --build
-        '
+      - name: Login
+        run: echo "${{ secrets.ghrc_b }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Si changement dans le front alors build
+      - name: Build Front
+        if: env.FRONTEND_CHANGED == 'true'
+        run: |
+          docker build -f ./frontend/Dockerfile -t ghcr.io/${{ github.repository }}/frontend:latest ./frontend
+          docker push ghcr.io/${{ github.repository }}/frontend:latest
+
+      # Si changement dans api alors build
+      - name: Build API
+        if: env.API_CHANGED == 'true'
+        run: |
+          docker build -f ./api/Dockerfile.prod -t ghcr.io/${{ github.repository }}/api:latest ./api
+          docker build -f ./api/Dockerfile.dev -t ghcr.io/${{ github.repository }}/api.dev:latest ./api
+          docker push ghcr.io/${{ github.repository }}/api:latest
+          docker push ghcr.io/${{ github.repository }}/api.dev:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+
+    # Rebuild sans downtime + reconnecte les volumes existants + recrée uniquement si changement + supprime les conteneurs non utilisés
+    steps:
+      - name: Deploy on Server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /home/$(whoami)/cleanwalk-org-v2/
+            git pull origin main
+            docker-compose pull
+            docker-compose up -d --remove-orphans
+            docker image prune -f
