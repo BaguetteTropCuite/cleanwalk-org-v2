@@ -2,17 +2,13 @@ version: '3.8'
 services:
 
   frontend:
-    build: 
-      context: ./front
-      dockerfile: Dockerfile
+    image: ghcr.io/${{ github.repository }}/frontend:latest
     restart: always
     networks:
       - my_network
 
   api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile.prod
+    image: ghcr.io/${{ github.repository }}/api:latest
     volumes:
       - ./uploads:/app/uploads
     restart: always
