@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
 import { useCleanwalkForm } from '@/composables/useAddCleanwalk'; // Import the composable
-import AutocompleteAddress from './AutocompleteAddress.vue';
-import dragDrop from './dragDrop.vue';
-import BaseInput from './base/BaseInput.vue';
+import AutocompleteAddress from '@/components/base/AutocompleteAddress.vue';
+import dragDrop from '@/components/dragDrop.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
 import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
-import BaseTextarea from './base/BaseTextarea.vue';
+import BaseTextarea from '@/components/base/BaseTextarea.vue';
+import dateService from '@/services/dateService';
+import IconClock from '@/components/icons/icon-clock.vue';
+import IconMiniMap from '@/components/icons/icon-mini-map.vue';
 
 
 const titles = ref([
-    'Nom de votre évènement',
-    'Lieu de votre évènement',
-    'Date et horaire',
-    'Description de votre évènement ',
-    'Ajouter une image',
-    'Aperçu de votre cleanwalk'
+  'Nom et lieu de l\'évènement',
+  'Date et horaire',
+  'Description de votre évènement ',
+  'Ajouter une image',
+  'Aperçu de votre cleanwalk'
 ]);
 
 
@@ -38,7 +40,6 @@ const conseils = ref([
   'Choisissez ici la date, la durée de votre ramassage (activités annexes comprises - goûter, pique-nique, …)',
   'Utilisez cet espace pour donner toute information complémentaire aux potentiels participants : matériel à apporter, parcours prévu, état des lieux, précisions sur le point de rendez-vous, etc.',
   'Vous avez la possibilité d’ajouter une image ou un visuel pour illustrer votre événement. Si vous ne choisissez pas d’image, une image par défaut sera appliquée automatiquement.',
-  'Avant de publier votre Cleanwalk, assurez-vous d’avoir vérifié chaque champ du formulaire. Si vous souhaitez apporter des modifications, cliquez sur le bouton de modification. Une fois que tout est en ordre, cliquez sur le bouton "Publier". Vous pourrez toujours ajuster les détails de votre Cleanwalk plus tard depuis votre compte.'
 ]);
 
 const getConseil = () => {
@@ -63,9 +64,6 @@ const next = () => {
     return;
   }
   if (progress.value === 5) {
-    if (!dragDropRef.value.imageSrc) {
-      return;
-    }
     upload();
     return;
   }
@@ -90,31 +88,48 @@ const back = () => {
       <h2>{{ titles[progress - 1] }}</h2>
       <div class="form">
         <div v-if="progress === 1">
-          <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="cleanwalk-name"
+          <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="nom de la cleanwalk"
             placeholder="Saisissez le nom de votre événement" />
-          <AutocompleteAddress v-model:query="newCleanwalk.address" @select-suggestion="handleSelectAddress" />
+          <AutocompleteAddress v-model:query="newCleanwalk.address" label="adresse" @select-suggestion="handleSelectAddress" />
         </div>
         <div v-if="progress === 2">
-          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
-          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
-          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.dateDay" name="date" type="date"
+            label="Date de l'évènement" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time"
+            label="Heure de début" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time"
+            label="Heure de fin" />
         </div>
-        <BaseTextarea v-if="progress === 3" v-model="newCleanwalk.description" name="description" id="description" label="Description" :rows="4" />  
+        <BaseTextarea v-if="progress === 3" v-model="newCleanwalk.description" name="description" id="description"
+          label="Description" :rows="4" />
         <dragDrop ref="dragDropRef" v-if="progress >= 4" :auto-upload="false" format="card" />
-        <div v-if="progress === 2">
-          test
-
+        <div v-if="progress === 5" class="preview">
+          <h3>{{ newCleanwalk.name }}</h3>
+          <div class="date-locate">
+            <div class="divtop">
+              <IconClock />
+              <div>
+                {{ dateService.getCleanwalkWrittenDate(new Date(newCleanwalk.date_begin), newCleanwalk.duration) }}
+              </div>
+            </div>
+            <div class="bot">
+              <IconMiniMap />
+              <div>{{ newCleanwalk.address }}</div>
+            </div>
+          </div>
+          <p>{{ newCleanwalk.description }}</p>
         </div>
+
 
       </div>
-      <div class="help">
+      <div v-if="progress<=4" class="help">
         <h3>Aide</h3>
         <p>{{ getConseil() }}</p>
       </div>
       <div class="btn-container">
-        <button class="btn back" @click="back" v-if="progress !== 1">Précédent</button>
+        <button class="btn back" @click="back()" v-if="progress !== 1">{{ progress === 5 ? 'Modifier' : 'Précédent' }}</button>
         <div class="btn" v-else></div>
-        <button class="btn next btn" @click="next">Suivant</button>
+        <button class="btn next btn" @click="next()">{{ progress === 5 ? 'Publier' : 'Suivant' }}</button>
       </div>
     </div>
 
@@ -209,6 +224,7 @@ const back = () => {
 
 .progress {
   padding-top: 3.9rem;
+
   h3 {
     width: 100%;
     text-align: left;
@@ -261,6 +277,6 @@ const back = () => {
 
 
   }
-  
+
 }
 </style>

@@ -104,6 +104,7 @@ def get_all_cleanwalks():
         Cleanwalk.duration,
         Cleanwalk.description,
         Cleanwalk.address,
+        Cleanwalk.img_url,
         User.name,
         User.role_id,
         User.profile_picture
@@ -126,6 +127,7 @@ def get_all_cleanwalks():
         'duration': cw.duration,
         'description': cw.description,
         'address': cw.address,
+        'img_url': cw.img_url,
         'host': {
             'name': cw.name,
             'role_id': cw.role_id,

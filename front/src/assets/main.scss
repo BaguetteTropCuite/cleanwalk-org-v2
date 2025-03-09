@@ -1,4 +1,4 @@
-@import './base.scss';
+@use './base.scss';
 
 #app {
   font-weight: normal;
@@ -21,8 +21,10 @@
 .action-button {
   background-color: var(--color-primary);
   color: #fff;
-  padding:0.75rem 0;
+  padding:1rem 0;
   width: 100%;
+  font-size: 18px;
+  font-weight: 700;
   text-align: center;
   border-radius: 8px;
 }

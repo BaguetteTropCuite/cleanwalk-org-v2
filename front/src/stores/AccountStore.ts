@@ -8,8 +8,8 @@ import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
 export const useAccountStore = defineStore('account', () => {
     const tokenName = 'access_token';
-    let CurrentUser: Ref<User|undefined> = ref();
-    let isLoggedIn = ref(false);
+    const CurrentUser: Ref<User|undefined> = ref();
+    const isLoggedIn = ref(false);
 
     const setToken = (token: string) => {
         //set token in local storage
@@ -17,8 +17,8 @@ export const useAccountStore = defineStore('account', () => {
         
     }
 
-    const getOrganisationById = async (organisationId: number) => {
-        const response: ApiResponse = await apiService.kyGet('/users/association/' + organisationId);
+    const getOrganizationById = async (organizationId: number) => {
+        const response: ApiResponse = await apiService.kyGet('/users/association/' + organizationId);
         if (!response.success) {
             return undefined;
         }
@@ -50,7 +50,7 @@ export const useAccountStore = defineStore('account', () => {
             email: response.data.email as string,
             name: response.data.name as string,
             id: response.data.id as number,
-            role: response.data.role as 'organisation' | 'user',
+            role: response.data.role as 'organization' | 'user',
             profile_picture: response.data.profile_picture as string,
         }
         CurrentUser.value = user;
@@ -98,5 +98,5 @@ export const useAccountStore = defineStore('account', () => {
         return true;
     }
 
-    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById, modifyAssociation, getAssoList, googleLoginSignup };
+    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganizationById, modifyAssociation, getAssoList, googleLoginSignup };
 })

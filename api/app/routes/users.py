@@ -2,7 +2,7 @@ import datetime
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import desc, func
-from app.models import Cleanwalk, CleanwalkUser, db, User, Role, Organisation
+from app.models import Cleanwalk, CleanwalkUser, db, User, Role, Organization
 from app.utils import validate_api_key, hash_password, upload_img, send_reset_email
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
@@ -56,17 +56,17 @@ def get_user(user_id):
 # Route to get association by user id
 @users_bp.route('/association/<string:user_id>', methods=['GET'])
 def get_association(user_id):
-    user = db.session.query(User, Organisation).join(Organisation, User.id == Organisation.user_id).filter(User.id == user_id).first()
+    user = db.session.query(User, Organization).join(Organization, User.id == Organization.user_id).filter(User.id == user_id).first()
 
     if user:
         user_data = {
             'id': user.User.id,
             'name': user.User.name,
             'email': user.User.email,
-            'description': user.Organisation.description,
-            'web_site': user.Organisation.web_site,
-            'social_medias': user.Organisation.social_medias,
-            'banner_img': user.Organisation.banner_img,
+            'description': user.Organization.description,
+            'web_site': user.Organization.web_site,
+            'social_medias': user.Organization.social_medias,
+            'banner_img': user.Organization.banner_img,
             'profile_picture': user.User.profile_picture,
             'role': user.User.role_id
         }
@@ -76,24 +76,24 @@ def get_association(user_id):
     
 # Route to get associations ordered by RAND
 @users_bp.route('/associations', methods=['GET'])
-def get_organisations():
-    organisations = db.session.query(User, Organisation).join(Organisation, User.id == Organisation.user_id).filter(User.role_id == 2).order_by(func.rand()).all()
-    if organisations:
-        organisation_data = []
-        for organisation in organisations:
-            organisation_data.append({
-                'id': organisation.User.id,
-                'name': organisation.User.name,
-                'email': organisation.User.email,
-                'description': organisation.Organisation.description,
-                'web_site': organisation.Organisation.web_site,
-                'social_medias': organisation.Organisation.social_medias,
-                'banner_img': organisation.Organisation.banner_img,
-                'profile_picture': organisation.User.profile_picture
+def get_organizations():
+    organizations = db.session.query(User, Organization).join(Organization, User.id == Organization.user_id).filter(User.role_id == 2).order_by(func.rand()).all()
+    if organizations:
+        organization_data = []
+        for organization in organizations:
+            organization_data.append({
+                'id': organization.User.id,
+                'name': organization.User.name,
+                'email': organization.User.email,
+                'description': organization.Organization.description,
+                'web_site': organization.Organization.web_site,
+                'social_medias': organization.Organization.social_medias,
+                'banner_img': organization.Organization.banner_img,
+                'profile_picture': organization.User.profile_picture
             })
-        return jsonify(organisation_data)
+        return jsonify(organization_data)
     else:
-        return jsonify({'message': 'Organisations not found'}), 404
+        return jsonify({'message': 'Organizations not found'}), 404
 
 # Route to get all users
 @users_bp.route('', methods=['GET'])
@@ -121,7 +121,7 @@ def get_all_users():
 def delete_user(user_id):
     user = User.query.get(user_id)
     # Check if user is an association
-    association = Organisation.query.filter_by(user_id=user_id).first()
+    association = Organization.query.filter_by(user_id=user_id).first()
     # Anonymize the user
     if association:
         association.description = None
@@ -274,8 +274,8 @@ def create_user():
         db.session.add(new_user)
         db.session.commit()
 
-        if role_id == 2:  # If the user is an organisation, create association table
-            new_association = Organisation(user_id=new_user.id)
+        if role_id == 2:  # If the user is an organization, create association table
+            new_association = Organization(user_id=new_user.id)
             db.session.add(new_association)
             db.session.commit()
 
@@ -333,8 +333,8 @@ def update_association(user_id):
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
-    # Check if the user is an organisation
-    association = Organisation.query.filter_by(user_id=user_id).first()
+    # Check if the user is an organization
+    association = Organization.query.filter_by(user_id=user_id).first()
     
     if not association:
         return jsonify({'message': 'Association not found'}), 404

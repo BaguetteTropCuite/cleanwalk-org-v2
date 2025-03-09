@@ -7,7 +7,7 @@ import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import dateService from '@/services/dateService'; // Assurez-vous d'importer correctement
 import dragDrop from './dragDrop.vue';
-import AutocompleteAddress from './AutocompleteAddress.vue';
+import AutocompleteAddress from './base/AutocompleteAddress.vue';
 import { format, parse } from 'date-fns';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import apiService from '@/services/apiService';

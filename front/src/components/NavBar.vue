@@ -75,7 +75,7 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-    @import '@/assets/base.scss';
+    @use '@/assets/main.scss';
     .nav {
         position: fixed;
         bottom: 0;
@@ -153,6 +153,7 @@ onMounted(() => {
             width: 100%;
             align-items: center;
             padding: 0 2rem;
+            z-index: 9998;
         
 
         .link {

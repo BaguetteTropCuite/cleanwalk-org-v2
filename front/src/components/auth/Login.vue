@@ -5,7 +5,7 @@ import { useAccountStore } from '@/stores/AccountStore';
 import type { User } from '@/interfaces/userInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { GoogleLogin } from 'vue3-google-login';
-import BaseInput from './base/BaseInput.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const router = useRouter();
 
@@ -46,7 +46,7 @@ const login = async () => {
         name: response.data.name as string,
         id: response.data.id as number,
         profile_picture: response.data.profile_picture as string,
-        role: response.data.role as "organisation" | "user",
+        role: response.data.role as "organization" | "user",
     }
     accountStore.CurrentUser = user;
     router.push({ path: '/' });

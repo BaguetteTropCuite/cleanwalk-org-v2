@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AuthTemplate from '@/components/authTemplate.vue';
-import Login from '@/components/Login.vue';
+import AuthTemplate from '@/components/auth/authTemplate.vue';
+import Login from '@/components/auth/Login.vue';
 
 </script>
 

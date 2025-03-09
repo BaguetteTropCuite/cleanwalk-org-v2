@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
-import L, { LatLng, LatLngBounds, Map, type PointExpression } from "leaflet";
-import { ref, type Ref, onMounted, nextTick, computed } from "vue";
+import L, { LatLng, LatLngBounds, type PointExpression } from "leaflet";
+import { ref, type Ref, onMounted, nextTick } from "vue";
 import iconLeftArrow from "@/components/icons/icon-left-arrow.vue";
 import iconSearch from "@/components/icons/icon-search.vue";
 import iconInfo from "./icons/icon-info.vue";
@@ -15,6 +15,17 @@ import cleanwalkCard from './cards/CleanwalkListCard.vue';
 import { useAccountStore } from "@/stores/AccountStore";
 import greenMapIcon from "@/assets/green-map.svg";
 import blueMapIcon from "@/assets/blue-map.svg";
+import { useCleanwalkMap } from "@/composables/useCleanwalkMap";
+
+const {
+    mapInstance,
+    filteredCleanwalks,
+    selectedCleanwalk,
+    searchInput,
+    setMapEvents,
+    setSelectedCleanwalk,
+    mapClick,
+} = useCleanwalkMap();
 
 const userImg = useAccountStore().CurrentUser?.profile_picture;
 
@@ -23,37 +34,15 @@ const cleanwalkStore = useCleanwalkStore();
 const draggableCard = ref<HTMLElement | null>(null);
 let zoom = ref(5);
 let center: Ref<PointExpression> = ref([47.866667, 2.333333]);
-let mapInstance: Ref<Map | null> = ref(null);
 let cardListBool = ref(false);  //to display or not the cleanwalk list
 const cleanwalkListContainer = ref<HTMLElement | null>(null); //ref to the html cleanwalk list container
-let selectedCleanwalk:Ref<Cleanwalk | null> = ref(null);
-
-const searchInput = ref("");
-
-const filteredCleanwalks = computed(() => {
-  if (!searchInput.value) {
-    return cleanwalkStore.cleanwalksTab;
-  }
-  return cleanwalkStore.cleanwalksTab.filter(cleanwalk =>
-    cleanwalk.name.toLowerCase().includes(searchInput.value.toLowerCase())||
-    cleanwalk.address.toLowerCase().includes(searchInput.value.toLowerCase())
-  );
-});
 
 const backButton = () => {
     cardListBool.value = false
     searchInput.value = "" //reset the search input
 };
 
-
-// Fonction pour initialiser les écouteurs d'événements de la carte
-const setMapEvents = (map: Map) => {
-    mapInstance.value = map;
-    // Ici, vous pouvez ajouter d'autres écouteurs d'événements ou logique relative à la carte
-};
-
 onMounted(() => {
-    cleanwalkStore.getAllCleanwalks();
     const card = draggableCard.value;
     if (!card) return;
 
@@ -96,12 +85,6 @@ onMounted(() => {
     card.addEventListener('touchstart', onTouchStart);
 });
 
-const setSelectedCleanwalk = (cleanwalkId: number) => {
-    const cw = cleanwalkStore.cleanwalksTab.find((cleanwalk) => cleanwalk.id === cleanwalkId);
-    if (cw) {
-        selectedCleanwalk.value = cw;
-    }
-};
 
 const getCleanwalkVisibleCount = () => {
     let count = 0;
@@ -161,8 +144,8 @@ function isPointVisible(lat: number, lng: number): boolean {
     return bounds.contains(point);
 }
 
-function mapClick() {
-    selectedCleanwalk.value = null;
+function mapClickEvent() {
+    mapClick();
     slideDown()
 }
 
@@ -172,7 +155,7 @@ function mapClick() {
     <main>
         <div class="map-container">
             <l-map ref="map" v-model:zoom="zoom" v-model:center="center" @ready="setMapEvents" :min-zoom="5"
-                @click="mapClick()" :useGlobalLeaflet="false">
+                @click="mapClickEvent()" :useGlobalLeaflet="false">
                 <l-tile-layer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"></l-tile-layer>
                 <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab" :key="cleanwalk.id">
                     <l-marker @click="slideUp(cleanwalk.id!)" :lat-lng="L.latLng(cleanwalk.pos_lat, cleanwalk.pos_long)">
@@ -397,6 +380,7 @@ main {
 
         .container {
             width: 100%;
+            padding: 5%;
             height: 100%;
             display: flex;
             flex-direction: column;

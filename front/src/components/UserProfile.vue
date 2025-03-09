@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { watch, ref, onMounted, type Ref } from 'vue';
-const backgroundImageUrl = ref('https://cdn2.thecatapi.com/images/1nk.jpg');
-import iconPhoto from '@/components/icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import router from '@/router';
 import iconShuffleArrow from './icons/icon-shuffle-arrow.vue';
@@ -11,6 +9,7 @@ import type { Association } from '@/interfaces/userInterface';
 import ProfileAssoAddon from './ProfileAssoAddon.vue';
 import BaseInput from './base/BaseInput.vue';
 import BaseTextarea from './base/BaseTextarea.vue';
+import LogoutButton from './buttons/LogoutButton.vue';
 
 const getToken = useAccountStore().getAccessToken;
 const showToast = useUtilsStore().showToast;
@@ -34,8 +33,8 @@ onMounted(async () => {
         router.push('/login');
         return;
     }
-    if (currentUser.value?.role === 'organisation') {
-        association.value = await accountStore.getOrganisationById(currentUser.value.id!);
+    if (currentUser.value?.role === 'organization') {
+        association.value = await accountStore.getOrganizationById(currentUser.value.id!);
         currentDescription.value = association.value?.description;
     }
 });
@@ -125,7 +124,7 @@ const changeUserPP = () => {
 
         <profile-asso-addon v-if="association" :Asso="association"/>
         
-        <div class="img-user" v-if="currentUser?.role !== 'organisation'">
+        <div class="img-user" v-if="currentUser?.role !== 'organization'">
             <img class="pp" :src="currentUser?.profile_picture" alt="cover-img">
             <div @click="changeUserPP()" class="icon-shuffle-arrow">
                 <iconShuffleArrow />
@@ -141,7 +140,7 @@ const changeUserPP = () => {
                 <BaseInput v-model="confirmNewMdp" name="confirmNewMdp" type="password" label="Confirmation du nouveau mot de passe" placeholder="Confirmez votre nouveau mot de passe" />
                 <button class="action-button" type="submit">Changer votre mot de passe</button>
             </form>
-            <button class="danger-button">Cloturer mon compte</button>
+            <LogoutButton />
         </div>
     </section>
 
@@ -268,5 +267,11 @@ const changeUserPP = () => {
     object-fit: cover;
     margin-top: 78px;
   }
+
+  @media (min-width: 768px) {
+        width: 40rem;
+        margin: 0 auto;
+        padding-top: 2rem;
+    }
 }
 </style>

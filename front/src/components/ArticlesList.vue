@@ -67,7 +67,7 @@ const articles: Article[] = [
     <SearchBar />
     <div class="container">
         <div v-for="article in articles" :key="article.id" class="card">
-            <img :src="article.imageUrl" alt="image de l'article" />
+            <img :src="article.imageUrl" alt="article image" />
             <div class="right">
               <h2>{{ article.title }}</h2>
               <div class="creation-date">{{ article.createdAt }}</div>

@@ -1,26 +1,25 @@
 <script setup lang="ts">
-import iconCross from './icons/icon-cross.vue';
-import { useAccountStore } from '@/stores/AccountStore';
+import { ref } from 'vue'
+import iconCross from '../icons/icon-cross.vue';
 
-const lougout = useAccountStore().logout;
-
-defineProps({
-    isVisible: Boolean,
-    togglePopup: Function,
-});
-
+// Define props
+const props = defineProps<{
+  isVisible: boolean,
+  tooglePopup: () => void,
+  leaveCw: () => void
+}>();
 
 </script>
 
 <template>
     <div v-if="isVisible" class="popup">
         <div class="popup-content">
-            <div class="cross"><iconCross @click="togglePopup!" /></div>
-            <h2>Se déconnecter</h2>
-            <p>Etes vous certain de vouloir vous déconnecter ?</p>
+            <div class="cross"><iconCross @click="tooglePopup!" /></div>
+            <h2>Se désinscrire</h2>
+            <p>Etes vous certain de vouloir vous désinscrire de la clenawalk</p>
             <div class="btn-container">
-                <button @click="togglePopup!" class="cancel-button">annuler</button>
-                <button @click="lougout()" class="danger-button">confirmer</button>
+                <button @click="tooglePopup!" class="cancel-button">annuler</button>
+                <button @click="leaveCw!" class="danger-button">confirmer</button>
             </div>
         </div>
     </div>

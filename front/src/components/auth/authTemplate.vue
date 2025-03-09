@@ -1,6 +1,6 @@
 <template>
     <section class="section">
-        <img src="../assets/coquelicots.webp" alt="todo" class="img">
+        <img src="../../assets/coquelicots.webp" alt="banner" class="img">
         <div class="container">
             <slot></slot>
         </div>

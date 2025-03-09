@@ -1,29 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import iconCross from './icons/icon-cross.vue';
+import iconCross from '../icons/icon-cross.vue';
+import { useAccountStore } from '@/stores/AccountStore';
 
-// Define props
-const props = defineProps<{
-  isVisible: boolean,
-  tooglePopup: () => void,
-  leaveCw: () => void
-}>();
+const lougout = useAccountStore().logout;
+
+defineProps({
+    isVisible: Boolean,
+    togglePopup: Function,
+});
+
 
 </script>
 
 <template>
-    <div v-if="isVisible" class="popup">
-        <div class="popup-content">
-            <div class="cross"><iconCross @click="tooglePopup!" /></div>
-            <h2>Se désinscrire</h2>
-            <p>Etes vous certain de vouloir vous désinscrire de la clenawalk</p>
+    <div v-if="isVisible" class="popup" @click="togglePopup!">
+        <div class="popup-content" @click.stop>
+            <div class="cross"><iconCross @click="togglePopup!" /></div>
+            <h2>Se déconnecter</h2>
+            <p>Etes vous certain de vouloir vous déconnecter ?</p>
             <div class="btn-container">
-                <button @click="tooglePopup!" class="cancel-button">annuler</button>
-                <button @click="leaveCw!" class="danger-button">confirmer</button>
+                <button @click="togglePopup!" class="cancel-button">annuler</button>
+                <button @click="lougout()" class="danger-button">confirmer</button>
             </div>
         </div>
     </div>
 </template>
+
 
 <style scoped lang="scss">
 .popup {
@@ -45,6 +47,8 @@ const props = defineProps<{
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         padding: 1rem;
         margin: 1.5rem;
+        position: relative;
+        z-index: 1001;
 
         .cross {
             display: flex;

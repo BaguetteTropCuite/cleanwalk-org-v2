@@ -123,7 +123,7 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles` (`id`, `role`) VALUES
 (1, 'user'),
-(2, 'organisation');
+(2, 'organization');
 
 -- --------------------------------------------------------
 

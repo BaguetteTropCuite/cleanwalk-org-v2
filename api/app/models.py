@@ -11,8 +11,8 @@ class User(db.Model):
     profile_picture = db.Column(db.String(255), nullable=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
 
-class Organisation(db.Model):
-    __tablename__ = 'organisations'
+class Organization(db.Model):
+    __tablename__ = 'organizations'
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     description = db.Column(db.String(255), nullable=True)
     web_site = db.Column(db.String(255), nullable=True)
@@ -21,7 +21,7 @@ class Organisation(db.Model):
     last_event = db.Column(db.TIMESTAMP, nullable=True)
 
     # Relation vers User
-    user = db.relationship('User', backref=db.backref('organisation', uselist=False))
+    user = db.relationship('User', backref=db.backref('organization', uselist=False))
 
 class Cleanwalk(db.Model):
     __tablename__ = 'cleanwalks'

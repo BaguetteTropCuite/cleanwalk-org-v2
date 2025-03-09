@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useCleanwalkForm } from '@/composables/useAddCleanwalk'; // Import the composable
-import AutocompleteAddress from './AutocompleteAddress.vue';
-import iconMiniMap from './icons/icon-mini-map.vue';
-import iconClock from './icons/icon-clock.vue';
-import dragDrop from './dragDrop.vue';
+import AutocompleteAddress from '@/components/base/AutocompleteAddress.vue';
+import iconMiniMap from '@/components/icons/icon-mini-map.vue';
+import iconClock from '@/components/icons/icon-clock.vue';
+import dragDrop from '@/components/dragDrop.vue';
 import dateService from '@/services/dateService';
-import BaseInput from './base/BaseInput.vue';
-import BaseTextarea from './base/BaseTextarea.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
+import BaseTextarea from '@/components/base/BaseTextarea.vue';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
 
@@ -73,7 +73,7 @@ const titles = ref([
 
 // Advice messages for the user
 const conseils = ref([
-  'Avant de lancer votre ramassage, pensez à consulter le guide du ramasseur pour connaître les règles d’or d’une bonne organisation.',
+  'Avant de lancer votre ramassage, pensez à consulter le guide du ramasseur pour connaître les règles d’or d’une bonne Organization.',
   'L’ajout d’une photo est optionnel'
 ]);
 

@@ -24,7 +24,7 @@ const toast = useUtilsStore().toast;
     border-radius: 0 0 0 8px;
     color: #fff;
     font-weight: bold;
-    z-index: 1000;
+    z-index: 9999;
     transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; // Réduisez la durée et ajoutez opacity
     pointer-events: none;
 

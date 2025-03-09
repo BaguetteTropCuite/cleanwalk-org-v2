@@ -98,7 +98,7 @@ https://www.usebruno.com/downloads
 
 - **Description:** Create a new user by providing the required information.
 - **Example:**
-- **Note:** role_id: 1 == user | 2 == organisation
+- **Note:** role_id: 1 == user | 2 == organization
 
 ```json
 {
