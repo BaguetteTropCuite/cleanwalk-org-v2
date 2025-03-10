@@ -58,7 +58,7 @@ jobs:
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
         run: |
-          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./frontend
+          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./front
           docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
 
       # Si changement dans api alors build
