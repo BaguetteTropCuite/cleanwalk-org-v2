@@ -28,7 +28,7 @@ jobs:
       - name: Check if front has changed
         id: check_frontend
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^front/'; then
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^frontend/'; then
             echo "FRONTEND_CHANGED=true" >> $GITHUB_ENV
           else
             echo "FRONTEND_CHANGED=false" >> $GITHUB_ENV
@@ -58,7 +58,7 @@ jobs:
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
         run: |
-          docker build -f ./frontend/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./frontend
+          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./frontend
           docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
 
       # Si changement dans api alors build
