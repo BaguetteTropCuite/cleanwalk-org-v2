@@ -11,6 +11,8 @@ services:
     volumes:
       - ./uploads:/app/uploads
     restart: always
+    env_file:
+      - ./api/.env
     networks:
       - my_network
 
