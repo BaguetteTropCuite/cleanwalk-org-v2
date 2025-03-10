@@ -1,4 +1,4 @@
-# Cleanwalk V2 DEV FORK => Original : https://github.com/cleanwalk-org-asso/cleanwalk-org-v2
+# Cleanwalk V2 DEV FORK ==> Original : https://github.com/cleanwalk-org-asso/cleanwalk-org-v2
 
 Cleanwalk.org is a website to find clean walks all over France.
 
