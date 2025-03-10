@@ -28,7 +28,7 @@ jobs:
       - name: Check if front has changed
         id: check_frontend
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^frontend/'; then
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^front/'; then
             echo "FRONTEND_CHANGED=true" >> $GITHUB_ENV
           else
             echo "FRONTEND_CHANGED=false" >> $GITHUB_ENV

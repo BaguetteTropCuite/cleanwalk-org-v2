@@ -15,6 +15,7 @@ const currentCleanwalk = ref<CleanwalkType | undefined>(undefined);
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
 
 // Update meta tags when cleanwalk data is loaded 2
+// test
 const updateMetaTags = (cleanwalk: CleanwalkType) => {
   if (!cleanwalk) return;
   
