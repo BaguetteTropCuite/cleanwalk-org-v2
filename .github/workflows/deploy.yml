@@ -1,7 +1,10 @@
-name: Deploy V1 TEST
+name: Deploy V1
 
-# Générer un token (write:packages, delete:packages)
-# CHANGER "git pull origin main" par "git pull origin release"
+# WORKFLOW SETUP : 
+# 1 : Generate token (write:packages, delete:packages)
+# 2 : Add secret ['secrets.SERVER_HOST','secrets.SERVER_USER','secrets.SERVER_SSH_KEY','secrets.SERVER_PORT']
+# 3 : Replace 'git pull origin main' with 'git pull origin release' during the rebuild phase
+# 4 : Change the push branch name to 'release
 
 on:
   push:
@@ -15,16 +18,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Majuscules de merde
+      
+      # Fix uppercase issues with URLs
+      - name: UPPER to lower
         run: |
           echo "ACTOR_LOWER=$(echo '${{ github.actor }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      # Track updates on API & front
       - name: Set up Git for checking changes
         run: git fetch --prune --unshallow
 
-      # Check des changements dans API et FRONT
       - name: Check if front has changed
         id: check_frontend
         run: |
@@ -43,7 +47,7 @@ jobs:
             echo "API_CHANGED=false" >> $GITHUB_ENV
           fi
 
-      # STOP si aucun changement détecté
+      # Stop if no changes were made
       - name: Stop if no changed was made to front or api
         run: |
           if [[ "$FRONTEND_CHANGED" == "false" && "$API_CHANGED" == "false" ]]; then
@@ -54,14 +58,12 @@ jobs:
       - name: Login
         run: echo "${{ secrets.ghrc }}" | docker login ghcr.io -u ${{ env.ACTOR_LOWER }} --password-stdin
 
-      # Si changement dans le front alors build
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
         run: |
           docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./front
           docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
 
-      # Si changement dans api alors build
       - name: Build API
         if: env.API_CHANGED == 'true'
         run: |
@@ -75,7 +77,7 @@ jobs:
     runs-on: ubuntu-latest
 
 
-    # Rebuild sans downtime + reconnecte les volumes existants + recrée uniquement si changement + supprime les conteneurs non utilisés
+    # Rebuild without downtime, only if changes were made + remove unused images
     steps:
       - name: Deploy on Server
         uses: appleboy/ssh-action@v0.1.10
